@@ -230,7 +230,8 @@
             },
             getMasked: function(skipMaskChars) {
                 var buf = [],
-                    value = p.val(),
+                    pval = p.val(),
+                    value = (pval && options.prefix && pval.startsWith(options.prefix)) ? pval.substring(options.prefix.length) : pval,
                     m = 0, maskLen = mask.length,
                     v = 0, valLen = value.length,
                     offset = 1, addMethod = 'push',
@@ -301,6 +302,10 @@
                 var lastMaskCharDigit = mask.charAt(lastMaskChar);
                 if (maskLen === valLen + 1 && !jMask.translation[lastMaskCharDigit]) {
                     buf.push(lastMaskCharDigit);
+                }
+
+                if (!skipMaskChars) {
+                    buf.unshift(options.prefix);
                 }
 
                 return buf.join('');
@@ -382,7 +387,12 @@
             var input = $(this),
                 options = {},
                 prefix = 'data-mask-',
-                mask = input.attr('data-mask');
+                mask = input.attr('data-mask'),
+                maskPrefix = input.attr('data-mask-prefix');
+
+            if (maskPrefix) {
+                options.prefix = maskPrefix;
+            }
 
             if (input.attr(prefix + 'reverse')) {
                 options.reverse = true;
